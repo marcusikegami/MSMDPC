@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { EDIT_POST } from '../utils/mutations';
 
 const PostForm = ({post}) => {
     const { header, body, image, imagecaption, video, category, _id } = post ;
 
      const [formState, setFormState] = useState({ _id: _id, header: header, body: body, category: category, image: image, imagecaption: imagecaption, video: video });
-    //  const [formState, setFormState] = useState({ header: '', body: '', category: '', video: '' });
-     const [editPost, { error }] = useMutation(EDIT_POST);
  
      const handleChange = (event) => {
          const { name, value } = event.target;
@@ -19,15 +15,7 @@ const PostForm = ({post}) => {
  
      const handleFormSubmit = async (event) => {
          event.preventDefault();
-         let paragraphsArray = gatherParagraphData();
-         try {
-              const { data } = await editPost({
-                 variables: { ...formState, body: paragraphsArray, _id: _id } 
-             });
-              window.location.href = `/post/${data.editPost._id}`;
-         } catch (err) {
-             console.error(error);
-         }
+         
         };
         
         let urlValidate = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;

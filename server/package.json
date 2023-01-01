@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-amplify": "^5.0.8",
     "aws-sdk": "^2.1272.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.3",

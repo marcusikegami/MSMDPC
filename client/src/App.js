@@ -1,14 +1,11 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { 
-  ApolloClient, 
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink
-} from '@apollo/client';
-import { createUploadLink } from 'apollo-upload-client';
-import { setContext } from '@apollo/client/link/context';
-
+// import aws-amplify methods
+import { Amplify, Auth, Hub } from 'aws-amplify';
+// import aws-amplify config from ../utils/amplify-configure.js
+import { config } from './utils/amplify-configure';
+// import components for use with Route Components
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Header from './components/Header';
@@ -23,31 +20,79 @@ import PtInfo from './pages/PtInfo';
 import SinglePost from './pages/SinglePost';
 import Upload from './pages/Upload';
 
-const httpLink = createUploadLink({
-  // header: {'Apollo-Require-Preflight': 'true'},
-  uri: 'http://localhost:3001/graphql'
-  // uri: '/graphql'
-});
+const isLocalhost = Boolean(
+  window.location.hostname === 'localhost' ||
+    // [::1] is the IPv6 localhost address.
+    window.location.hostname === '[::1]' ||
+    // 127.0.0.1/8 is considered localhost for IPv4.
+    window.location.hostname.match(
+      /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+    )
+);
 
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('id_token');
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : ''
-    },
-  };
-});
+// Assuming you have two redirect URIs, and the first is for localhost and second is for production
+const [
+  localRedirectSignIn,
+  productionRedirectSignIn,
+] = config.oauth.redirectSignIn.split(',');
 
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-});
+const [
+  localRedirectSignOut,
+  productionRedirectSignOut,
+] = config.oauth.redirectSignOut.split(',');
+
+const updatedAwsConfig = {
+  ...config,
+  oauth: {
+    ...config.oauth,
+    redirectSignIn: isLocalhost ? localRedirectSignIn : productionRedirectSignIn,
+    redirectSignOut: isLocalhost ? localRedirectSignOut : productionRedirectSignOut,
+  }
+}
+
+Amplify.configure(updatedAwsConfig);
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    Hub.listen('auth', ({ payload: { event, data } }) => {
+      switch (event) {
+        case 'signIn':
+        case 'cognitoHostedUI':
+          getUser().then(userData => setUser(userData));
+          break;
+        case 'signOut':
+          setUser(null);
+          break;
+        case 'signIn_failure':
+        case 'cognitoHostedUI_failure':
+          console.log('Sign in failure', data);
+          break;
+        default:
+          // do nothing
+      }
+    });
+
+    getUser().then(userData => setUser(userData));
+  }, []);
+
+  function getUser() {
+    return Auth.currentAuthenticatedUser()
+      .then(userData => userData)
+      .catch(() => console.log('Not signed in'));
+  }
+
   return (
-    <ApolloProvider client={client}>
      <Router>
+      <div>
+      <p>User: {user ? JSON.stringify(user.attributes) : 'None'}</p>
+      {user ? (
+        <button onClick={() => Auth.signOut()}>Sign Out</button>
+      ) : (
+        <button onClick={() => Auth.federatedSignIn()}>Federated Sign In</button>
+      )}
+    </div>
       <Header />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -64,8 +109,6 @@ function App() {
         </Routes>
         <Footer />
      </Router>
-      
-    </ApolloProvider>
   );
 }
 

@@ -1,68 +1,43 @@
-import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { LOGIN_ADMIN } from '../utils/mutations';
+import { Auth, Amplify } from 'aws-amplify';
+// import { CognitoHostedUIIdentityProvider } from "@aws-amplify/auth/lib/types";
 
-import Auth from '../utils/auth';
+Amplify.configure({
+    Auth: {
+      identityPoolId: '729894398568-3mtkm1bb6dq34v2p3j8hdaa12q3ppksu.apps.googleusercontent.com',
+      region: 'us-west-2',
+      userPoolId: 'us-west-2_vrGN73trt',
+      userPoolWebClientId: '7u9sv3qmv6mbiill0c4q5b7nbd',
+      identityProvider: 'google',
+      authenticationFlowType: 'USER_PASSWORD_AUTH',
+      oauth: {
+          domain: 'your_cognito_domain',
+          scope: ['phone', 'email', 'profile', 'openid', 'aws.cognito.signin.user.admin'],
+          redirectSignIn: 'http://localhost:3000/',
+          redirectSignOut: 'http://localhost:3000/',
+          responseType: 'code' // or 'token', note that REFRESH token will only be generated when the responseType is code
+      }
+    },
+  });
+
+  async function login() {
+    debugger;
+    try {
+      console.log('Starting login process...');
+      const session = await Auth.federatedSignIn({ provider: 'Google' });
+      console.log('User logged in: ', session);
+    } catch (error) {
+      console.error('Error logging in: ', error);
+    }
+  }
 
 const Login = (props) => {
-    const [formState, setFormState] = useState({ username: '', password: '' });
-    const [login, { error }] = useMutation(LOGIN_ADMIN);
 
-    //handle login form state change
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-
-        setFormState({
-            ...formState,
-            [name]: value,
-        });
-    };
-
-    const handleFormSubmit = async (event) => {
-        event.preventDefault();
-        console.log(formState);
-        try {
-            const { data } = await login({
-                variables: { ...formState },
-            });
-
-            Auth.login(data.login.token);
-        } catch (err) {
-            console.error(err);
-        }
-
-        setFormState({
-            username: '',
-            password: '',
-        });
-    };
 
     return (
         <main>
             <div id='login-wrapper'>
-                <form id='testimonial-form' onSubmit={handleFormSubmit}>
-                    <input
-                        className='form-input'
-                        placeholder='Username'
-                        name='username'
-                        type='text'
-                        id='username'
-                        value={formState.username}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className='form-input'
-                        placeholder='Password'
-                        name='password'
-                        type='password'
-                        id='password'
-                        value={formState.password}
-                        onChange={handleChange}
-                    />
-                    <button type='submit'>Login</button>
-                </form>
-
-                {error && <div>Login Failed</div>}
+                <button onClick={() => window.location.replace(process.env.AWS_COGNITO_LOGIN_URI || 'https://schollortho.auth.us-west-2.amazoncognito.com/login?client_id=7u9sv3qmv6mbiill0c4q5b7nbd&response_type=code&scope=email+openid+phone&redirect_uri=http%3A%2F%2Flocalhost%3A3000')}>Login</button>
+                <button onClick={() => login()}>Login</button>
             </div>
         </main>
     )

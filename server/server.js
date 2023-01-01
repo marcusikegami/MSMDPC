@@ -3,6 +3,7 @@ import path from 'path';
 import authMiddleware from './utils/auth.js';
 import userRoutes from './routes/user-routes.js';
 import adminRoutes from './routes/admin-routes.js';
+import authRoutes from './routes/auth-routes.js';
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -17,6 +18,8 @@ if (process.env.NODE_ENV === 'production') {
 app.use('/', userRoutes);
 // app.use(require('./routes'));
 app.use('/api/', adminRoutes);
+app.use('/auth/', authRoutes);
+
 // Start the API server
 app.listen(PORT, () =>
   console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`),

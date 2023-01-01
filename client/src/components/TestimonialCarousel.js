@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@apollo/client";
-import { QUERY_APPROVED_TESTIMONIALS } from "../utils/queries";
+
 import {FaArrowAltCircleRight, FaArrowAltCircleLeft} from 'react-icons/fa';
 
 
 const TestimonialCarousel = () => {
 const [current, setCurrent] = useState(0);
 
-    const { loading, data } = useQuery(QUERY_APPROVED_TESTIMONIALS);
-    const testimonials = data?.approvedTestimonials;
-    const length = testimonials?.length || 0;
+    const testimonials = []; // data?.approvedTestimonials;
+    const length = 0; // testimonials?.length || 0;
 
     const carouselScroll = () => {
         if(current === length - 1) {
