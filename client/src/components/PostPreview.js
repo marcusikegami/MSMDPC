@@ -1,11 +1,11 @@
-import auth from "../utils/auth";
 import { Link } from 'react-router-dom';
 
-const PostPreview = ({post}) => {
+const PostPreview = (post, user) => {
+    let Post = post;
         let postbody = post.body[0].body.substr(0, 228);
     return (
         <div key={post._id} className="post">
-            {auth.loggedIn() && (<Link className="button" to={`/edit-post/${post._id}`}>Edit Post</Link>)}
+            {user && (<Link className="button" to={`/edit-post/${post._id}`}>Edit Post</Link>)}
             <Link  className="post-anchor" to={`/post/${post._id}`}>
                 <h2 className="post-title">{post.header}</h2>
                 <p className="post-date">{post.createdAt}</p>

@@ -1,36 +1,38 @@
-import express from 'express';
-import AWS from 'aws-sdk';
-import dotenv from 'dotenv';
+const express = require('express');
+const passport = require('passport');
 
-AWS.config.update({
-    region: 'us-west-2',
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-});
+const router = express.Router();
 
-router.post('/login', (req, res) => {
-    const username = process.env.DB_USERNAME;
-    const password = process.env.DB_PASSWORD;
+// Auth Routes
 
-  
-    if (req.body.username != username && req.body.password != password) {
-        res.status(401).send('Invalid username or password');
-        return;
-    }
-        // login successful, do something here (e.g. set a session cookie)
-        console.log('login successful');
-        const token = signToken(username);
-        return res.json(token);
+router.get('/google/callback', passport.authenticate('google', { 
+  scope: ['profile', 'email'],
+  failureRedirect: '/login/failure',
+  successRedirect: process.env.CLIENT_URL,
+}));
+
+router.get('/login/failure', (req, res) => {
+  res.status(401).json({
+    error: true,
+    message: 'Login Failed'
   });
-
-router.get('/login', (req, res) => {
-    window.location.href(process.env.AWS_COGNITO_LOGIN_URI || 'https://scholl-website.auth.us-west-2.amazoncognito.com/login?response_type=code&client_id=7u9sv3qmv6mbiill0c4q5b7nbd&redirect_uri=http://localhost:3000/admin');
 });
 
-router.post('/logout', (req, res) => {
-    // logout successful, do something here (e.g. clear a session cookie)
-    console.log('logout successful');
-    res.json({ message: 'logout successful' });
+router.get('/login/success', (req, res) => {
+  if (req.user) {
+    res.status(200).json({
+      error: false,
+      message: 'Login Successful',
+      user: req.user
+    });
+  }
+})
+//Logout
+router.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect(process.env.CLIENT_URL);
 });
 
-export default router;
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+module.exports = router;

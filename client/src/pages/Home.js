@@ -1,13 +1,11 @@
-import { useQuery } from '@apollo/client';
-import { QUERY_POSTS } from '../utils/queries';
 // import Auth from '../utils/auth';
 import CategoryPreviews from '../components/CategoryPreviews';
 import Slideshow from '../components/Slideshow';
 import TestimonialCarousel from '../components/TestimonialCarousel';
 
 const Home = () => {
-    const { data } = useQuery(QUERY_POSTS);
-    const posts = data?.posts || [];
+    // const { data } = useQuery(QUERY_POSTS);
+    // const posts = data?.posts || [];
 
     // const loggedIn = Auth.loggedIn();
     const main = document.getElementById('main');
@@ -60,7 +58,7 @@ const Home = () => {
                 </div>
                 <div className='category-preview'>
                     <div id="news-and-updates">
-                        {posts && <CategoryPreviews posts={posts} /> }
+                        {/* {posts && <CategoryPreviews posts={posts} /> } */}
                     </div>
                 </div>
                 <div id='testimonial-slideshow-wrapper'>

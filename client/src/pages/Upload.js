@@ -1,25 +1,22 @@
-import { useMutation } from '@apollo/client';
 import { useState } from 'react';
-import auth from '../utils/auth';
-import { UPLOAD_FILE, ADD_PDF } from '../utils/mutations';
 
 const UploadForm = () => {
     const [formState, setFormState] = useState({ pdfname: '', url: '', category: 'Select Category'});
-    const [addPdf] = useMutation(ADD_PDF, {
-        onCompleted: data => console.log(data)
-    });
-    const [uploadFile] = useMutation(UPLOAD_FILE, {
-        onCompleted: data => console.log(data)
-    });
+    // const [addPdf] = useMutation(ADD_PDF, {
+    //     onCompleted: data => console.log(data)
+    // });
+    // const [uploadFile] = useMutation(UPLOAD_FILE, {
+    //     onCompleted: data => console.log(data)
+    // });
 
     const handleFileChange = event => {
         let confirm = window.confirm('Are you sure you want to upload this file?');
-        if(confirm) {
-            const file = event.target.files[0];
-            console.log(file);
-            if(!file) return;
-            uploadFile({ variables: { file } })
-        }
+        // if(confirm) {
+        //     const file = event.target.files[0];
+        //     console.log(file);
+        //     if(!file) return;
+        //     uploadFile({ variables: { file } })
+        // }
     }
 
     const handleChange = event => {
@@ -34,22 +31,21 @@ const UploadForm = () => {
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
-        if(formState.category === '' || formState.category === 'Select Category') {
-            window.alert('Please select a category');
-            return;
-        }
-                try {
-                     const { data } = await addPdf({ variables: { ...formState} });
-                     window.alert('Completed');
-                     setFormState({ pdfname: '', url: '', category: ''});
-                } catch (err) {
-                    console.error(err);
-                    window.alert(`${err}`);
-               }
-            return;
+        // if(formState.category === '' || formState.category === 'Select Category') {
+        //     window.alert('Please select a category');
+        //     return;
+        // }
+        //         try {
+        //              const { data } = await addPdf({ variables: { ...formState} });
+        //              window.alert('Completed');
+        //              setFormState({ pdfname: '', url: '', category: ''});
+        //         } catch (err) {
+        //             console.error(err);
+        //             window.alert(`${err}`);
+        //        }
+        //     return;
     };
 
-    if (auth.loggedIn()) {
         return (
             <div id='upload-container'>
                 <h1>Upload File</h1>
@@ -110,10 +106,6 @@ const UploadForm = () => {
                 </form>
             </div>
         )
-    } else {
-        window.location.assign('/');
-    }
-
 }
 
 export default UploadForm;

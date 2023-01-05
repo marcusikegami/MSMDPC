@@ -1,5 +1,5 @@
-import express from 'express';
-import AWS from 'aws-sdk';
+const express = require('express');
+const AWS = require('aws-sdk');
 const router = express.Router();
 
 AWS.config.update({
@@ -56,4 +56,4 @@ router.get('/posts/:category', (req, res) => {
     });
 });
 
-export default router;
+module.exports = router;

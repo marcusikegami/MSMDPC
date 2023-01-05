@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { ADD_POST } from '../utils/mutations';
 
-import auth from '../utils/auth';
-
-const CreatePost = (props) => {
-    if(!auth.loggedIn()) {
+const CreatePost = (user) => {
+    if(!user) {
         window.location.assign('/');
     }
     const [formState, setFormState] = useState({ header: '', body: [], category: '', image: '', imagecaption: '', video: '' });
-    const [createPost, { error }] = useMutation(ADD_POST);
+    // const [createPost, { error }] = useMutation(ADD_POST);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -26,17 +22,17 @@ const CreatePost = (props) => {
         event.preventDefault();
                 let paragraphsArray = gatherParagraphData();
                 console.log(paragraphsArray);
-                try {
-                     const { data } = await createPost({
-                        variables: { ...formState,
-                        body: paragraphsArray}
-                    });
+            //     try {
+            //          const { data } = await createPost({
+            //             variables: { ...formState,
+            //             body: paragraphsArray}
+            //         });
         
-                    window.location.href = `/post/${data.addPost._id}`;
-                } catch (err) {
-                    console.error(error);
-                    window.alert(`${err}`);
-               }
+            //         window.location.href = `/post/${data.addPost._id}`;
+            //     } catch (err) {
+            //         console.error(error);
+            //         window.alert(`${err}`);
+            //    }
             return;
     };
 

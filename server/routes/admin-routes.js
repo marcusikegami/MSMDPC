@@ -1,7 +1,6 @@
-import express from 'express';
-import AWS from 'aws-sdk';
-import dotenv from 'dotenv';
-dotenv.config();
+const express = require('express');
+const AWS = require('aws-sdk');
+require('dotenv').config();
 const router = express.Router();
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
@@ -32,4 +31,4 @@ router.post('/create-post', (req, res) => {
 });
 
 
-export default router;
+module.exports = router;

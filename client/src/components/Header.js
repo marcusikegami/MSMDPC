@@ -1,7 +1,8 @@
-import auth from '../utils/auth';
 import bars from '../assets/images/bars.svg';
 
-const Header = () => {
+const Header = (userDetails) => {
+
+  const user = userDetails.user;
 
   function dropdown() {
     if(window.matchMedia("(max-width: 1100px)").matches) {
@@ -15,12 +16,13 @@ const Header = () => {
   }
   const logout = event => {
       event.preventDefault();
-      auth.logout();
+      window.open(process.env.BACKEND_URL + '/auth/logout', '_self');
   } 
     return (
         <div>
-          {auth.loggedIn() && (
+          {user && (
             <div id='adminMenu'>
+              <p>Logged in as {user.name}</p>
                 <p>Logged in as Admin</p>
                 <div className='actions'>
                     <a href='/upload'>Upload PDF</a>
